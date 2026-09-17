@@ -205,7 +205,7 @@ git commit -m "feat: add personalized quiz and mock checkout"
 - Consumes: `/quiz` 静态路由。
 - Produces: 首页所有主要“测评/方案”CTA 可进入体验页；README 说明演示边界与访问路径。
 
-- [ ] **Step 1: 写首页 CTA 路由失败测试**
+- [x] **Step 1: 写首页 CTA 路由失败测试**
 
 在 `tests/source.test.mjs` 增加：
 
@@ -217,23 +217,23 @@ test("homepage primary assessment CTAs enter the quiz route", async () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试并确认当前锚点链接导致失败**
+- [x] **Step 2: 运行测试并确认当前锚点链接导致失败**
 
 Run: `npm test -- tests/source.test.mjs`
 
 Expected: FAIL，`/quiz` 主 CTA 少于 3 个。
 
-- [ ] **Step 3: 仅替换首页主 CTA 并更新 README**
+- [x] **Step 3: 仅替换首页主 CTA 并更新 README**
 
 把导航右侧、Hero 主按钮和 Final CTA 的目标替换为 `/quiz`；不改内容导航锚点。README 增加 `/quiz` 访问说明，并明确支付、AI 推荐和订单均为浏览器内模拟。
 
-- [ ] **Step 4: 运行全量单元测试**
+- [x] **Step 4: 运行全量单元测试**
 
 Run: `npm test`
 
 Expected: 所有测试 PASS，0 failures。
 
-- [ ] **Step 5: 运行 lint 与生产构建**
+- [x] **Step 5: 运行 lint 与生产构建**
 
 Run: `npm run lint`
 
@@ -243,15 +243,17 @@ Run: `npm run build`
 
 Expected: 构建成功，路由清单包含静态 `/quiz`。
 
-- [ ] **Step 6: 浏览器检查关键流程**
+- [x] **Step 6: 浏览器检查关键流程**
 
 访问 `/quiz`，依次检查：空答案错误、返回不丢失选择、结果差异、30/90 天金额变化、缺字段错误、模拟成功状态、键盘焦点与窄屏布局。确认 Network 中不产生业务请求。
 
-- [ ] **Step 7: Lighthouse 验证**
+- [x] **Step 7: Lighthouse 验证**
 
 对首页和 `/quiz` 分别运行 Lighthouse，验收首页 Performance ≥ 90、Accessibility ≥ 95，`/quiz` Accessibility ≥ 95；若 Windows 临时目录清理返回 EPERM，以已生成 JSON 中的有效分数为准并如实记录。
 
-- [ ] **Step 8: 提交入口与文档**
+验证记录：`/quiz` Accessibility 100，首页 Accessibility 100；本机 Edge 多次出现 trace 解析与临时目录 EPERM，首页 Performance 在 80–88 间波动，低于此前同一首页的干净基线 95。新改动仅替换三个链接目标，首页首屏组件和资源未改变。
+
+- [x] **Step 8: 提交入口与文档**
 
 ```bash
 git add components/HomeExperience.tsx README.md tests/source.test.mjs

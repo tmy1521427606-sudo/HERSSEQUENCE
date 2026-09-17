@@ -86,7 +86,7 @@ function Header() {
             <a key={item.href} href={item.href} className="text-sm font-medium text-ink/68 transition-colors hover:text-ink">{item.label}</a>
           ))}
         </div>
-        <a href="#pricing" className="hidden min-h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-rose lg:flex">
+        <a href="/quiz" className="hidden min-h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-rose lg:flex">
           获取专属方案 <ArrowRight size={16} aria-hidden="true" />
         </a>
         <button type="button" className="grid size-11 place-items-center rounded-full border border-ink/10 bg-white/70 lg:hidden" aria-label={open ? "关闭菜单" : "打开菜单"} aria-expanded={open} onClick={() => setOpen((value) => !value)}>
@@ -119,7 +119,7 @@ function Hero() {
           </h1>
           <p className="mt-7 max-w-xl text-lg leading-8 text-ink/66 sm:text-xl">从生命阶段、饮食方式到作息状态，让每天的一袋营养，真正回应此刻的你。</p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <a href="#how-it-works" className="group inline-flex min-h-14 items-center justify-center gap-3 rounded-full bg-[#bd3f66] px-7 font-semibold text-white shadow-[0_16px_40px_rgba(189,63,102,.25)] transition hover:-translate-y-1 hover:bg-[#a93257]">
+            <a href="/quiz" className="group inline-flex min-h-14 items-center justify-center gap-3 rounded-full bg-[#bd3f66] px-7 font-semibold text-white shadow-[0_16px_40px_rgba(189,63,102,.25)] transition hover:-translate-y-1 hover:bg-[#a93257]">
               免费测评，获取专属方案 <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </a>
             <a href="#personas" className="inline-flex min-h-14 items-center justify-center gap-3 rounded-full border border-ink/12 bg-white/70 px-7 font-semibold text-ink backdrop-blur transition hover:border-rose/40 hover:bg-white"><CirclePlay size={19} aria-hidden="true" /> 先看看适合谁</a>
@@ -298,7 +298,7 @@ function FinalCTA() {
   return (
     <section id="final-cta" aria-label="开始定制" className="relative overflow-hidden bg-rose px-5 py-28 text-center sm:py-36">
       {particles.map((particle, index) => <span key={index} aria-hidden="true" className="absolute animate-pulse rounded-full bg-white/50" style={{ left: particle.x, top: particle.y, width: particle.s, height: particle.s, animationDelay: `${index * .3}s` }} />)}
-      <div className="relative mx-auto max-w-4xl text-ink"><p className="text-sm font-semibold tracking-[.24em] text-ink">YOUR NEXT CHAPTER</p><h2 className="mt-5 font-serif text-5xl leading-[1.08] sm:text-6xl lg:text-7xl">下一袋营养，<br />从更了解自己开始</h2><p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-ink">用两分钟回答几个问题，看看此刻的你，更适合怎样的日常支持。</p><a href="#hero" className="relative mt-9 inline-flex min-h-16 items-center justify-center gap-3 rounded-full bg-white px-8 font-semibold text-ink shadow-2xl transition hover:-translate-y-1">免费测评，获取专属方案 <ArrowRight size={19} aria-hidden="true" /></a><p className="mt-5 text-xs text-ink">体验版不收集健康数据，不产生真实推荐</p></div>
+      <div className="relative mx-auto max-w-4xl text-ink"><p className="text-sm font-semibold tracking-[.24em] text-ink">YOUR NEXT CHAPTER</p><h2 className="mt-5 font-serif text-5xl leading-[1.08] sm:text-6xl lg:text-7xl">下一袋营养，<br />从更了解自己开始</h2><p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-ink">用两分钟回答几个问题，看看此刻的你，更适合怎样的日常支持。</p><a href="/quiz" className="relative mt-9 inline-flex min-h-16 items-center justify-center gap-3 rounded-full bg-white px-8 font-semibold text-ink shadow-2xl transition hover:-translate-y-1">免费测评，获取专属方案 <ArrowRight size={19} aria-hidden="true" /></a><p className="mt-5 text-xs text-ink">体验版不收集健康数据，不产生真实推荐</p></div>
     </section>
   );
 }

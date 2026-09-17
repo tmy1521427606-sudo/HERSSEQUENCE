@@ -43,3 +43,10 @@ test("quiz route exposes the complete demo flow and accessibility affordances", 
     assert.match(source, new RegExp(marker));
   }
 });
+
+test("homepage primary assessment CTAs enter the quiz route", async () => {
+  const source = await readFile(new URL("../components/HomeExperience.tsx", import.meta.url), "utf8");
+  const quizLinks = source.match(/href=["']\/quiz["']/g) ?? [];
+
+  assert.ok(quizLinks.length >= 3);
+});

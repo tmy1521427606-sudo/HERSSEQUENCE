@@ -1,0 +1,6 @@
+.next/
+out/
+node_modules/
+.sites-runtime/
+lighthouse-report.json
+*.log

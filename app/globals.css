@@ -22,9 +22,19 @@ body {
   margin: 0;
   background: var(--cream);
   color: var(--ink);
-  font-family: var(--font-noto), var(--font-inter), system-ui, sans-serif;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, system-ui, sans-serif;
   font-size: 1rem;
   line-height: 1.6;
+  overflow-x: clip;
+}
+
+::selection {
+  background: rgba(232, 108, 141, 0.25);
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1,

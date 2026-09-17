@@ -8,6 +8,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        serif: ["DM Serif Display", "Georgia", "Noto Serif SC", "serif"],
+        sans: ["Inter", "PingFang SC", "Microsoft YaHei", "Arial", "system-ui", "sans-serif"],
+      },
       colors: {
         ink: "#1A1A2E",
         rose: "#E86C8D",

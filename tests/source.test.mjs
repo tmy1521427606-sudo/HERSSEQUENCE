@@ -33,3 +33,13 @@ test("homepage exposes accessibility and demo-state affordances", async () => {
     assert.match(source, new RegExp(marker));
   }
 });
+
+test("quiz route exposes the complete demo flow and accessibility affordances", async () => {
+  const page = await readFile(new URL("../app/quiz/page.tsx", import.meta.url), "utf8");
+  const experience = await readFile(new URL("../components/QuizExperience.tsx", import.meta.url), "utf8");
+  const source = `${page}\n${experience}`;
+
+  for (const marker of ["QuizExperience", "aria-pressed", "aria-live", "模拟支付，不会扣款", "重新测评"]) {
+    assert.match(source, new RegExp(marker));
+  }
+});

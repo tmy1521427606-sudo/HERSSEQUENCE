@@ -125,7 +125,7 @@ git commit -m "feat: add quiz recommendation rules"
 - Consumes: `generatePlan`, `getOrderSummary`, `validateCheckout` from `lib/quiz-utils.ts`。
 - Produces: 静态 `/quiz` 页面，内部阶段为 `quiz | result | checkout | success`。
 
-- [ ] **Step 1: 写路由与关键无障碍契约的失败测试**
+- [x] **Step 1: 写路由与关键无障碍契约的失败测试**
 
 在 `tests/source.test.mjs` 增加：
 
@@ -140,13 +140,13 @@ test("quiz route exposes the complete demo flow and accessibility affordances", 
 });
 ```
 
-- [ ] **Step 2: 运行测试并确认因路由文件缺失而失败**
+- [x] **Step 2: 运行测试并确认因路由文件缺失而失败**
 
 Run: `npm test -- tests/source.test.mjs`
 
 Expected: FAIL，原因是 `app/quiz/page.tsx` 或 `components/QuizExperience.tsx` 不存在。
 
-- [ ] **Step 3: 创建静态路由与元数据**
+- [x] **Step 3: 创建静态路由与元数据**
 
 ```tsx
 import type { Metadata } from "next";
@@ -162,31 +162,31 @@ export default function QuizPage() {
 }
 ```
 
-- [ ] **Step 4: 实现四步测评界面**
+- [x] **Step 4: 实现四步测评界面**
 
 使用原生 `button` + `aria-pressed` 呈现单选项；“下一步”在未选择时保留可点击状态以展示 `aria-live` 错误；“上一步”保留既有答案。顶部提供返回首页、`第 N / 4 步` 与进度条。切换动画通过 `useReducedMotion()` 将位移动画降级为仅淡入。
 
-- [ ] **Step 5: 实现方案结果界面**
+- [x] **Step 5: 实现方案结果界面**
 
 结果调用 `generatePlan(answers)`，呈现方案标题、三个带服用时间的营养卡、选择理由、来源与生活方式说明、合规提示；提供“重新测评”和“继续模拟订阅”。
 
-- [ ] **Step 6: 实现模拟结算与完成状态**
+- [x] **Step 6: 实现模拟结算与完成状态**
 
 结算界面提供 30/90 天原生按钮选择、四个带显式 `label` 的收货字段、三种带 `aria-pressed` 的视觉支付方式、实时订单摘要以及“模拟支付，不会扣款”。提交只调用 `validateCheckout`，错误通过 `aria-live` 公布；成功后用 ref 聚焦成功标题，显示“返回首页”和“重新测评”。
 
-- [ ] **Step 7: 运行新增源代码契约测试**
+- [x] **Step 7: 运行新增源代码契约测试**
 
 Run: `npm test -- tests/source.test.mjs`
 
 Expected: 全部 PASS。
 
-- [ ] **Step 8: 运行类型与 lint 检查并修复本任务引入的问题**
+- [x] **Step 8: 运行类型与 lint 检查并修复本任务引入的问题**
 
 Run: `npm run lint`
 
 Expected: 0 errors、0 warnings。
 
-- [ ] **Step 9: 提交完整体验**
+- [x] **Step 9: 提交完整体验**
 
 ```bash
 git add app/quiz/page.tsx components/QuizExperience.tsx tests/source.test.mjs

@@ -2,5 +2,6 @@
 out/
 node_modules/
 .sites-runtime/
+.worktrees/
 lighthouse-report.json
 *.log

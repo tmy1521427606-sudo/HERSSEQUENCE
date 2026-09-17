@@ -35,7 +35,7 @@
 - Produces: `validateCheckout(fields: CheckoutFields, payment: string): Record<string, string>`。
 - Consumes: `quiz-content.ts` 中按 id 索引的问题选项、目标方案和阶段补充项。
 
-- [ ] **Step 1: 写方案生成的失败测试**
+- [x] **Step 1: 写方案生成的失败测试**
 
 ```js
 test("generates distinct focus plans and keeps the maternal caution", async () => {
@@ -49,13 +49,13 @@ test("generates distinct focus plans and keeps the maternal caution", async () =
 });
 ```
 
-- [ ] **Step 2: 运行测试并确认因模块缺失而失败**
+- [x] **Step 2: 运行测试并确认因模块缺失而失败**
 
 Run: `npm test -- tests/quiz-utils.test.mjs`
 
 Expected: FAIL，原因是 `lib/quiz-utils.ts` 尚不存在。
 
-- [ ] **Step 3: 写价格与结算校验的失败测试**
+- [x] **Step 3: 写价格与结算校验的失败测试**
 
 ```js
 test("returns literal 30 and 90 day totals", async () => {
@@ -77,7 +77,7 @@ test("requires every delivery field and one payment option", async () => {
 });
 ```
 
-- [ ] **Step 4: 实现最小纯函数与集中内容数据**
+- [x] **Step 4: 实现最小纯函数与集中内容数据**
 
 ```ts
 export function getOrderSummary(cycle: BillingCycle): OrderSummary {
@@ -99,13 +99,13 @@ export function validateCheckout(fields: CheckoutFields, payment: string) {
 
 `generatePlan` 以目标提供两个核心成分，以生命阶段提供第三个成分；纯素/偏素状态替换来源说明，晚睡/高压/轮班增加生活方式提示，孕产阶段固定返回专业咨询提示。
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 Run: `npm test -- tests/quiz-utils.test.mjs`
 
 Expected: 3 个新增测试全部 PASS。
 
-- [ ] **Step 6: 提交纯规则层**
+- [x] **Step 6: 提交纯规则层**
 
 ```bash
 git add tests/quiz-utils.test.mjs lib/quiz-utils.ts quiz-content.ts
@@ -257,4 +257,3 @@ Expected: 构建成功，路由清单包含静态 `/quiz`。
 git add components/HomeExperience.tsx README.md tests/source.test.mjs
 git commit -m "feat: connect homepage to quiz demo"
 ```
-

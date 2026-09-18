@@ -3,40 +3,37 @@
 import Image from "next/image";
 import {
   ArrowRight,
+  ArrowUp,
   Brain,
   CalendarDays,
   Check,
   ChevronDown,
   CirclePlay,
   ClipboardCheck,
+  Clock,
   Heart,
-  Instagram,
   Leaf,
-  Menu,
-  Mic,
   PackageCheck,
-  Pause,
   Play,
   ShieldCheck,
   Sparkles,
   Stethoscope,
   Target,
-  X,
 } from "lucide-react";
-import { AnimatePresence, LazyMotion, domAnimation, m as motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
+import { LazyMotion, domAnimation, m as motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
 import { type MouseEvent, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
-  compliance,
   faqs,
-  footerColumns,
   ingredientFilters,
   ingredients,
-  navigation,
+  lockCountdown,
   painPoints,
   personas,
   planBenefits,
   plans,
   principles,
+  stickyCta,
   steps,
   stories,
   trustItems,
@@ -44,7 +41,9 @@ import {
   type IngredientTag,
   type Persona,
 } from "@/content";
-import { filterIngredients, formatPrice, nextVoiceState, pricePerDay, type VoiceState } from "@/lib/site-utils";
+import { filterIngredients, formatPrice, pricePerDay } from "@/lib/site-utils";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 
 const icons = {
   sparkles: Sparkles,
@@ -72,42 +71,9 @@ function SectionIntro({ eyebrow, title, copy, light = false }: { eyebrow: string
   );
 }
 
-function Header() {
-  const [open, setOpen] = useState(false);
-  return (
-    <header className="absolute inset-x-0 top-0 z-40">
-      <nav className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-5 sm:px-8 lg:px-12" aria-label="主要导航">
-        <a href="#hero" className="group flex min-h-11 items-center gap-3 font-semibold tracking-[0.16em] text-ink">
-          <span className="grid size-9 place-items-center rounded-full bg-ink text-xs text-white transition-transform group-hover:rotate-6">她</span>
-          <span>HERSEQUENCE</span>
-        </a>
-        <div className="hidden items-center gap-8 lg:flex">
-          {navigation.map((item) => (
-            <a key={item.href} href={item.href} className="text-sm font-medium text-ink/68 transition-colors hover:text-ink">{item.label}</a>
-          ))}
-        </div>
-        <a href="/quiz" className="hidden min-h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-rose lg:flex">
-          获取专属方案 <ArrowRight size={16} aria-hidden="true" />
-        </a>
-        <button type="button" className="grid size-11 place-items-center rounded-full border border-ink/10 bg-white/70 lg:hidden" aria-label={open ? "关闭菜单" : "打开菜单"} aria-expanded={open} onClick={() => setOpen((value) => !value)}>
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </nav>
-      <AnimatePresence>
-        {open && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mx-5 rounded-3xl border border-ink/10 bg-white p-4 shadow-soft lg:hidden">
-            {navigation.map((item) => <a key={item.href} href={item.href} onClick={() => setOpen(false)} className="flex min-h-12 items-center rounded-2xl px-4 font-medium hover:bg-lilac">{item.label}</a>)}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
-  );
-}
-
 function Hero() {
   return (
-    <section id="hero" aria-label="品牌介绍" className="relative min-h-[880px] overflow-hidden bg-[radial-gradient(circle_at_80%_10%,#f4d7e0_0,transparent_35%),linear-gradient(135deg,#fff9f8_15%,#f7f1fb_100%)] pt-28">
-      <Header />
+    <section id="hero" aria-label="品牌介绍" className="relative min-h-[880px] overflow-hidden bg-[radial-gradient(circle_at_80%_10%,#f4d7e0_0,transparent_35%),linear-gradient(135deg,#fff9f8_15%,#f7f1fb_100%)] pt-36">
       <div className="absolute -left-24 top-56 size-64 rounded-full border border-rose/15" />
       <div className="relative mx-auto grid max-w-[1440px] items-center gap-12 px-5 pb-16 pt-12 sm:px-8 lg:min-h-[760px] lg:grid-cols-[0.92fr_1.08fr] lg:px-12 lg:py-20">
         <div className="relative z-10">
@@ -272,7 +238,7 @@ function Pricing() {
         <SectionIntro eyebrow="SUBSCRIPTION" title="为坚持，留一点轻松的位置" copy="透明定价、自由调整。先选择适合你的节奏，方案内容再根据测评生成。" />
         <Reveal className="mx-auto mt-14 max-w-4xl"><div className="overflow-hidden rounded-[2.5rem] border border-ink/8 bg-cream shadow-soft">
           <div className="grid lg:grid-cols-[.9fr_1.1fr]">
-            <div className="relative overflow-hidden bg-ink p-7 text-white sm:p-10"><div className="absolute -right-16 -top-16 size-56 rounded-full bg-rose/25 blur-3xl" /><div className="relative"><div className="inline-flex rounded-full bg-white/8 p-1" role="group" aria-label="选择订阅周期">{plans.map((item, index) => <button type="button" key={item.id} aria-pressed={planIndex === index} onClick={() => setPlanIndex(index)} className={`min-h-11 rounded-full px-5 text-sm font-semibold transition ${planIndex === index ? "bg-white text-ink" : "text-white/75"}`}>{item.label}</button>)}</div><p className="mt-10 text-sm text-white/70">{plan.badge}</p><div className="mt-2 flex items-end gap-3"><span className="font-serif text-7xl">{formatPrice(plan.price)}</span><span className="mb-3 text-white/65">/ {plan.days} 天</span></div><p className="mt-3 text-sm text-white/70"><span className="line-through">{formatPrice(plan.compareAt)}</span><span className="ml-3 rounded-full bg-[#bd3f66] px-3 py-1 font-semibold text-white">节省 {plan.saving}%</span></p><p className="mt-7 text-lg text-white/80">{plan.note}</p><p className="mt-2 text-sm text-white/65">约 {pricePerDay(plan.price, plan.days)}</p></div></div>
+            <div className="relative overflow-hidden bg-ink p-7 text-white sm:p-10"><div className="absolute -right-16 -top-16 size-56 rounded-full bg-rose/25 blur-3xl" /><div className="relative"><div className="inline-flex rounded-full bg-white/8 p-1" role="group" aria-label="选择订阅周期">{plans.map((item, index) => <button type="button" key={item.id} aria-pressed={planIndex === index} onClick={() => setPlanIndex(index)} className={`min-h-11 rounded-full px-5 text-sm font-semibold transition ${planIndex === index ? "bg-white text-ink" : "text-white/75"}`}>{item.label}</button>)}</div><p className="mt-10 text-sm text-white/70">{plan.badge}</p><div className="mt-2 flex items-end gap-3"><span className="font-serif text-7xl">{formatPrice(plan.price)}</span><span className="mb-3 text-white/65">/ {plan.days} 天</span></div><p className="mt-3 text-sm text-white/70"><span className="line-through">{formatPrice(plan.compareAt)}</span><span className="ml-3 rounded-full bg-[#bd3f66] px-3 py-1 font-semibold text-white">节省 {plan.saving}%</span></p><p className="mt-7 text-lg text-white/80">{plan.note}</p><p className="mt-2 text-sm text-white/65">约 {pricePerDay(plan.price, plan.days)}</p><LockCountdown /></div></div>
             <div className="p-7 sm:p-10"><p className="text-sm font-semibold tracking-[.16em] text-[#a93257]">EVERY BOX INCLUDES</p><ul className="mt-7 space-y-5">{planBenefits.map((benefit) => <li key={benefit} className="flex gap-3 text-ink/70"><span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-rose/12 text-[#a93257]"><Check size={14} strokeWidth={3} aria-hidden="true" /></span>{benefit}</li>)}</ul><a href="#final-cta" className="mt-9 inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-full bg-[#bd3f66] px-6 font-semibold text-white shadow-[0_16px_35px_rgba(189,63,102,.22)] transition hover:-translate-y-1 hover:bg-[#a93257]">开始 5 分钟测评 <ArrowRight size={18} aria-hidden="true" /></a><p className="mt-4 text-center text-xs leading-5 text-ink/70">品牌展示定价，本站不发起真实订单或扣款</p></div>
           </div>
         </div></Reveal>
@@ -303,32 +269,98 @@ function FinalCTA() {
   );
 }
 
-function VoiceDemo() {
-  const [open, setOpen] = useState(false);
-  const [state, setState] = useState<VoiceState>("idle");
-  const [seconds, setSeconds] = useState(0);
-  useEffect(() => { if (state !== "connecting") return; const id = window.setTimeout(() => setState("active"), 1200); return () => window.clearTimeout(id); }, [state]);
-  useEffect(() => { if (state !== "active") { setSeconds(0); return; } const id = window.setInterval(() => setSeconds((value) => value + 1), 1000); return () => window.clearInterval(id); }, [state]);
-  function act() { setState((current) => nextVoiceState(current)); }
-  const status = state === "idle" ? "准备好后，开始一段语音交互" : state === "connecting" ? "正在载入语音交互…" : `对话中 · 00:${String(seconds).padStart(2, "0")}`;
+const pad2 = (value: number) => String(value).padStart(2, "0");
+
+/** 每天 20:00 锁单，倒计时只在客户端运行，避免与静态导出内容不一致。 */
+function LockCountdown() {
+  const [left, setLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
+
+  useEffect(() => {
+    function nextLockTime() {
+      const now = new Date();
+      const end = new Date(now);
+      end.setHours(20, 0, 0, 0);
+      if (end.getTime() <= now.getTime()) end.setDate(end.getDate() + 1);
+      return end.getTime();
+    }
+    function tick() {
+      const diff = Math.max(0, nextLockTime() - Date.now());
+      setLeft({
+        hours: Math.floor(diff / 3_600_000),
+        minutes: Math.floor((diff % 3_600_000) / 60_000),
+        seconds: Math.floor((diff % 60_000) / 1000),
+      });
+    }
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const units = left
+    ? ([["hours", left.hours], ["minutes", left.minutes], ["seconds", left.seconds]] as const)
+    : [];
+
   return (
-    <div className="fixed bottom-5 right-5 z-50 sm:bottom-7 sm:right-7">
-      <AnimatePresence>
-        {open && <motion.aside initial={{ opacity: 0, y: 18, scale: .96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 18, scale: .96 }} className="mb-3 w-[min(355px,calc(100vw-2.5rem))] overflow-hidden rounded-[1.75rem] border border-white/50 bg-ink text-white shadow-[0_28px_90px_rgba(26,26,46,.34)]" aria-label="AI 语音顾问">
-          <div className="flex items-center justify-between border-b border-white/10 p-5"><div><p className="text-xs font-semibold tracking-[.16em] text-rose-200">HER AI · VOICE</p><h2 className="mt-1 font-serif text-2xl">AI 语音顾问</h2></div><button type="button" onClick={() => { setOpen(false); setState("idle"); }} aria-label="关闭语音窗口" className="grid size-11 place-items-center rounded-full bg-white/8 hover:bg-white/14"><X size={18} /></button></div>
-          <div className="p-5"><p className="rounded-2xl bg-white/7 p-4 text-sm leading-6 text-white/65">“最近入睡有点慢，而且白天工作强度很高，我该优先关注什么？”</p><div className="my-6 flex h-14 items-center justify-center gap-1" aria-hidden="true">{[18, 34, 24, 46, 30, 40, 20, 36, 16].map((height, index) => <motion.span key={index} className="w-1 rounded-full bg-rose" animate={state === "active" ? { height: [10, height, 10] } : { height: 8 }} transition={{ duration: .7, repeat: state === "active" ? Infinity : 0, delay: index * .06 }} />)}</div><p className="text-center text-sm text-white/52" aria-live="polite">{status}</p>{state === "active" && <div className="mt-5 rounded-2xl bg-rose/12 p-4"><p className="text-xs font-semibold text-rose-200">方案提示</p><p className="mt-2 text-sm leading-6 text-white/72">先从作息记录开始；营养方向可关注甘氨酸镁与 B 族维生素。</p></div>}<button type="button" onClick={act} disabled={state === "connecting"} className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-rose font-semibold text-white disabled:cursor-wait disabled:opacity-70">{state === "active" ? <><Pause size={17} />结束对话</> : <><Mic size={17} />{state === "connecting" ? "载入中…" : "开始对话"}</>}</button><p className="mt-3 text-center text-[11px] text-white/35">界面交互展示，不会调用麦克风或外部 AI 服务</p></div>
-        </motion.aside>}
-      </AnimatePresence>
-      <button type="button" onClick={() => setOpen((value) => !value)} aria-label="AI 语音顾问" aria-expanded={open} className="ml-auto flex min-h-14 items-center gap-3 rounded-full bg-ink px-5 font-semibold text-white shadow-[0_16px_45px_rgba(26,26,46,.3)] transition hover:-translate-y-1"><span className="relative grid size-8 place-items-center rounded-full bg-rose text-ink"><Mic size={16} className="relative" /></span><span className="hidden sm:inline">AI 语音顾问</span></button>
+    <div className="mt-7 rounded-2xl border border-white/12 bg-white/6 p-4">
+      <p className="flex items-center gap-2 text-xs font-semibold tracking-[.14em] text-rose-200">
+        <Clock size={14} aria-hidden="true" />{lockCountdown.label}
+      </p>
+      <div className="mt-3 flex items-center gap-2" aria-hidden="true">
+        {units.length > 0 ? (
+          units.map(([unit, value]) => (
+            <span key={unit} className="rounded-xl bg-ink/45 px-3 py-2 text-center">
+              <span className="block font-serif text-2xl leading-none tabular-nums">{pad2(value)}</span>
+              <span className="mt-1 block text-[10px] text-white/45">{lockCountdown.unitLabels[unit]}</span>
+            </span>
+          ))
+        ) : (
+          <span className="text-sm text-white/50">{lockCountdown.hint}</span>
+        )}
+      </div>
+      <p className="mt-3 text-[11px] leading-5 text-white/50">{lockCountdown.hint}</p>
     </div>
   );
 }
 
-function Footer() {
+function StickyBuyBar() {
+  const reduced = useReducedMotion();
+  function toTop() {
+    window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+  }
   return (
-    <footer className="bg-ink px-5 pb-10 pt-20 text-white sm:px-8">
-      <div className="mx-auto max-w-[1280px]"><div className="grid gap-12 border-b border-white/10 pb-14 lg:grid-cols-[1.3fr_1.7fr]"><div><a href="#hero" className="inline-flex items-center gap-3 font-semibold tracking-[.16em]"><span className="grid size-10 place-items-center rounded-full bg-rose text-ink">她</span> HERSEQUENCE</a><p className="mt-5 max-w-sm leading-7 text-white/70">关注女性每一个阶段的定制营养订阅，让信息更透明，也让坚持更轻松。</p><div className="mt-6 flex gap-3"><span className="grid size-11 place-items-center rounded-full border border-white/20"><Instagram size={18} /></span><span className="grid size-11 place-items-center rounded-full border border-white/20 font-serif">微</span></div></div><div className="grid grid-cols-2 gap-8 sm:grid-cols-3">{footerColumns.map((column) => <div key={column.title}><h2 className="text-sm font-semibold">{column.title}</h2><ul className="mt-5 space-y-3">{column.links.map((link) => <li key={link}><a href="#hero" className="text-sm text-white/70 transition hover:text-white">{link}</a></li>)}</ul></div>)}</div></div><div className="flex flex-col gap-5 pt-8 text-xs leading-6 text-white/65 lg:flex-row lg:items-start lg:justify-between"><p className="max-w-4xl">{compliance}</p><p className="shrink-0">© 2026 HERSEQUENCE</p></div></div>
-    </footer>
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-ink/10 bg-white/95 px-4 pb-3 pt-3 backdrop-blur lg:hidden">
+      <div className="flex items-center gap-3">
+        <a href="#pricing" className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold text-ink">{stickyCta.price}</span>
+          <span className="mt-0.5 block truncate text-[11px] text-ink/50">{stickyCta.note}</span>
+        </a>
+        <button
+          type="button"
+          onClick={toTop}
+          aria-label={stickyCta.backToTop}
+          className="grid size-11 shrink-0 place-items-center rounded-full border border-ink/12 text-ink/60 transition hover:border-rose/40 hover:text-ink"
+        >
+          <ArrowUp size={17} aria-hidden="true" />
+        </button>
+        <Link href="/quiz" className="flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-[#bd3f66] px-5 text-sm font-semibold text-white transition hover:bg-[#a93257]">
+          {stickyCta.cta} <ArrowRight size={16} aria-hidden="true" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function BackToTop() {
+  const reduced = useReducedMotion();
+  return (
+    <button
+      type="button"
+      onClick={() => window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" })}
+      aria-label={stickyCta.backToTop}
+      className="fixed bottom-24 right-7 z-30 hidden size-12 place-items-center rounded-full border border-ink/10 bg-white/90 text-ink/60 shadow-soft backdrop-blur transition hover:-translate-y-1 hover:text-ink lg:grid"
+    >
+      <ArrowUp size={18} aria-hidden="true" />
+    </button>
   );
 }
 
@@ -336,10 +368,12 @@ export default function HomeExperience() {
   return (
     <LazyMotion features={domAnimation}>
       <a href="#main-content" className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-ink px-5 py-3 font-semibold text-white transition focus:translate-y-0">跳到主要内容</a>
+      <SiteHeader overlay />
       <main id="main-content"><Hero /><PainPoints /><HowItWorks /><Personas /><IngredientLibrary /><Stories /><Pricing /><FAQ /><FinalCTA /></main>
-      <Footer />
-      <VoiceDemo />
-      <span className="sr-only">页面动效支持 prefers-reduced-motion 设置。</span>
+      <SiteFooter />
+      <StickyBuyBar />
+      <BackToTop />
+      <span className="sr-only">页面动效支持 prefers-reduced-motion 设置；顾问面板为界面交互展示，不调用外部 AI 服务。</span>
     </LazyMotion>
   );
 }

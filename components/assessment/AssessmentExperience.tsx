@@ -29,6 +29,7 @@ import {
   validateAnswer,
 } from "@/lib/assessment-engine";
 import { buildRecommendation, type RecommendationResult } from "@/lib/recommendation-engine";
+import { useAuth } from "@/components/auth-context";
 import QuestionRenderer from "@/components/assessment/QuestionRenderer";
 import ExitConfirm from "@/components/assessment/ExitConfirm";
 import ResultDashboard from "@/components/assessment/ResultDashboard";
@@ -39,12 +40,15 @@ type View = "intro" | "questions" | "result" | "checkout" | "success";
 export default function AssessmentExperience() {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
+  const { user, openLogin } = useAuth();
   const [view, setView] = useState<View>("intro");
   const [answers, setAnswers] = useState<AssessmentAnswers>({});
   const [cursor, setCursor] = useState(0);
   const [error, setError] = useState("");
   const [exitOpen, setExitOpen] = useState(false);
   const [result, setResult] = useState<RecommendationResult | null>(null);
+  const [pendingCheckout, setPendingCheckout] = useState(false);
+  const reminded = useRef(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   const visible = useMemo(() => computeVisibleQuestions(answers), [answers]);
@@ -60,6 +64,22 @@ export default function AssessmentExperience() {
   useEffect(() => {
     if (view === "questions") headingRef.current?.focus();
   }, [current?.id, view]);
+
+  // 测评完成后提醒登录：只在首次进入结果页时弹出一次，可关闭。
+  useEffect(() => {
+    if (view !== "result" || user || reminded.current) return;
+    reminded.current = true;
+    const id = window.setTimeout(() => openLogin("reminder"), 700);
+    return () => window.clearTimeout(id);
+  }, [view, user, openLogin]);
+
+  // 结算前的登录门禁：登录成功后自动继续到结算步骤。
+  useEffect(() => {
+    if (user && pendingCheckout) {
+      setPendingCheckout(false);
+      setView("checkout");
+    }
+  }, [user, pendingCheckout]);
 
   function updateAnswer(questionId: string, next: AssessmentAnswers) {
     const cleaned = cleanupAnswers(next);
@@ -107,7 +127,19 @@ export default function AssessmentExperience() {
     setCursor(0);
     setError("");
     setResult(null);
+    reminded.current = false;
+    setPendingCheckout(false);
     setView("intro");
+  }
+
+  /** 结算入口：未登录时先唤起登录提醒，登录成功后自动继续。 */
+  function requestCheckout() {
+    if (!user) {
+      setPendingCheckout(true);
+      openLogin("login");
+      return;
+    }
+    setView("checkout");
   }
 
   const transition = reduceMotion ? { duration: 0 } : { duration: 0.42, ease: [0.16, 1, 0.3, 1] as const };
@@ -231,9 +263,11 @@ export default function AssessmentExperience() {
                 {view === "result" && result && (
                   <ResultDashboard
                     result={result}
+                    signedIn={Boolean(user)}
+                    onLogin={() => openLogin("login")}
                     onRestart={restart}
                     onBackEdit={() => { setView("questions"); setCursor(0); }}
-                    onCheckout={() => setView("checkout")}
+                    onCheckout={requestCheckout}
                   />
                 )}
 
@@ -241,6 +275,7 @@ export default function AssessmentExperience() {
                   <AssessmentCheckout
                     planTitle={`${result.basePack.title}${result.focusModules.length > 0 ? ` + ${result.focusModules.map((module) => module.title).join(" + ")}` : ""}`}
                     ingredientCount={result.basePack.ingredients.length + result.focusModules.reduce((sum, module) => sum + module.ingredients.length, 0)}
+                    accountName={user?.displayName}
                     onBack={() => setView("result")}
                     onSuccess={() => setView("success")}
                   />

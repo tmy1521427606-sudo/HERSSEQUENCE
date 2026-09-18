@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, CreditCard, LockKeyhole } from "lucide-react";
+import { ArrowLeft, CircleCheck, CreditCard, LockKeyhole } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { checkoutCopy, paymentMethods, type BillingCycle } from "@/assessment-content";
 import { getPlanPricing } from "@/lib/recommendation-engine";
@@ -29,11 +29,13 @@ export function validateCheckout(fields: CheckoutFields, payment: string): Recor
 export default function AssessmentCheckout({
   planTitle,
   ingredientCount,
+  accountName,
   onBack,
   onSuccess,
 }: {
   planTitle: string;
   ingredientCount: number;
+  accountName?: string;
   onBack: () => void;
   onSuccess: () => void;
 }) {
@@ -68,7 +70,14 @@ export default function AssessmentCheckout({
           <h1 className="mt-3 font-serif text-4xl leading-tight text-ink sm:text-5xl">{checkoutCopy.title}</h1>
           <p className="mt-3 text-ink/56">{planTitle} · 每日 {ingredientCount} 项营养</p>
         </div>
-        <span className="inline-flex items-center gap-2 rounded-full bg-[#fff0f4] px-4 py-2 text-sm font-semibold text-[#a93257]"><LockKeyhole size={15} aria-hidden="true" /> 安全支付</span>
+        <span className="flex flex-wrap items-center gap-2">
+          {accountName && (
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#f2faf6] px-4 py-2 text-sm font-semibold text-[#2f7355]">
+              <CircleCheck size={15} aria-hidden="true" /> 已登录 · {accountName}
+            </span>
+          )}
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#fff0f4] px-4 py-2 text-sm font-semibold text-[#a93257]"><LockKeyhole size={15} aria-hidden="true" /> 安全支付</span>
+        </span>
       </div>
 
       <fieldset className="mt-8">

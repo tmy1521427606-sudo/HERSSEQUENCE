@@ -1,8 +1,9 @@
 "use client";
 
-import { ArrowRight, Check, CircleAlert, ClipboardList, Leaf, RefreshCw, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, Check, CircleAlert, CircleCheck, ClipboardList, Leaf, LockKeyhole, RefreshCw, ShieldCheck, Sparkles } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { assessmentCopy, evidenceLevels, ingredients } from "@/assessment-content";
+import { authCopy } from "@/auth-content";
 import type { RecommendationResult } from "@/lib/recommendation-engine";
 
 const levelStyles = {
@@ -68,11 +69,15 @@ function IngredientCard({ ingredientId, reason }: { ingredientId: string; reason
 
 export default function ResultDashboard({
   result,
+  signedIn,
+  onLogin,
   onRestart,
   onBackEdit,
   onCheckout,
 }: {
   result: RecommendationResult;
+  signedIn: boolean;
+  onLogin: () => void;
   onRestart: () => void;
   onBackEdit: () => void;
   onCheckout: () => void;
@@ -230,6 +235,32 @@ export default function ResultDashboard({
         </>
       )}
 
+      {signedIn ? (
+        <p className="mt-6 flex items-center gap-2 rounded-[1.35rem] border border-[#3f8f6b]/25 bg-[#f2faf6] p-4 text-sm font-medium text-[#2f7355]">
+          <CircleCheck size={18} className="shrink-0" aria-hidden="true" />{authCopy.savedBadge}
+        </p>
+      ) : (
+        <div className="mt-6 flex flex-col gap-4 rounded-[1.35rem] border border-rose/25 bg-[#fff8fa] p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-full bg-rose/15 text-[#a93257]">
+              <LockKeyhole size={17} aria-hidden="true" />
+            </span>
+            <div>
+              <p className="font-semibold text-ink">{authCopy.savePromptTitle}</p>
+              <p className="mt-1 text-sm leading-6 text-ink/60">{authCopy.reminderCopy}</p>
+              <p className="mt-2 text-xs text-ink/45">{authCopy.demoLabel}：{authCopy.demoValue}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onLogin}
+            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-rose px-6 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#f07d9b]"
+          >
+            {authCopy.savePromptCta} <ArrowRight size={16} aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
       <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
         <div className="flex flex-col gap-3 sm:flex-row">
           <button type="button" onClick={onRestart} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-ink/12 bg-white px-6 font-semibold text-ink transition hover:border-rose/45">
@@ -241,7 +272,8 @@ export default function ResultDashboard({
         </div>
         {green && (
           <button type="button" onClick={onCheckout} className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-7 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-rose">
-            {assessmentCopy.result.checkout} <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            {signedIn ? assessmentCopy.result.checkout : authCopy.checkoutGateCta}
+            <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </button>
         )}
       </div>

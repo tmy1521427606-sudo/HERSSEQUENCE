@@ -33,11 +33,128 @@ export type Ingredient = {
 };
 
 export const navigation = [
-  { label: "定制方式", href: "#how-it-works" },
-  { label: "女性方案", href: "#personas" },
-  { label: "透明成分", href: "#ingredients" },
-  { label: "订阅计划", href: "#pricing" },
+  { label: "定制方式", href: "/#how-it-works" },
+  { label: "女性方案", href: "/#personas" },
+  { label: "透明成分", href: "/#ingredients" },
+  { label: "订阅计划", href: "/#pricing" },
+  { label: "关于她序", href: "/about" },
 ];
+
+export const announcement = {
+  items: ["新客订阅礼遇 · 90 天装立省 ¥318", "满 ¥199 免运费", "支持在下一周期锁单前暂停或跳过"],
+  dismiss: "关闭公告",
+};
+
+export const accountMenu = [
+  { id: "plan", label: "我的方案", copy: "查看当前阶段与成分清单", href: "/quiz" },
+  { id: "subscription", label: "订阅管理", copy: "暂停、跳过或调整周期", href: "/policies#terms" },
+  { id: "orders", label: "订单与物流", copy: "查看发货时效与配送范围", href: "/policies#shipping" },
+  { id: "support", label: "联系客服", copy: "站内顾问在线，也可留言", href: "/contact" },
+];
+
+export const cartPanel = {
+  title: "订阅袋",
+  count: 0,
+  empty: "订阅袋是空的",
+  emptyHint: "完成测评后，方案会加入订阅袋。",
+  itemName: "待生成方案",
+  itemMeta: "30 天装 · 每日一袋",
+  cta: "去完成测评",
+  note: "结算前可随时调整周期与方案内容。",
+};
+
+export const stickyCta = {
+  price: "¥299 起 / 30 天",
+  note: "含每日独立日包，可随时暂停",
+  cta: "开始测评",
+  backToTop: "回到顶部",
+};
+
+export const freeShipping = {
+  threshold: 199,
+  label: "免运费进度",
+  empty: "完成测评后，方案金额会显示在这里",
+  prefix: "再买",
+  suffix: "即可免运费",
+  done: "已满足免运费条件",
+};
+
+export const cartSummary = {
+  subtotalLabel: "小计",
+  checkout: "去结算",
+  checkoutBlocked: "完成测评后开启结算",
+  secure: "结算流程不含真实扣款",
+};
+
+export const accountCopy = {
+  guest: "访客模式",
+  guestHint: "登录后可保存方案与管理订阅",
+  signIn: "登录",
+  signUp: "注册",
+  signInHint: "体验账号 123 / 123；注册将在正式上线后开放",
+};
+
+export const guarantees = [
+  {
+    id: "shipping",
+    title: "满 ¥199 免运费",
+    copy: "工作日 1–2 天发出，常规地区 2–4 天送达",
+  },
+  {
+    id: "returns",
+    title: "7 天退换",
+    copy: "未开封订单可在签收后 7 天内申请退换",
+  },
+  {
+    id: "pause",
+    title: "暂停或跳过",
+    copy: "下一周期锁单前可在订阅管理里自由调整",
+  },
+  {
+    id: "support",
+    title: "工作日 09:00–21:00",
+    copy: "站内顾问随时文字答疑，人工留言次日处理",
+  },
+];
+
+export const newsletter = {
+  title: "订阅她序来信",
+  copy: "每月一封：阶段营养笔记、成分更新与配方迭代说明。不做促销轰炸。",
+  placeholder: "你的邮箱地址",
+  submit: "订阅",
+  success: "已记录，正式上线后你会收到第一封信。",
+  invalid: "请输入有效的邮箱地址",
+  consentLead: "提交即表示同意我们的",
+  consentTail: "，邮箱不会用于第三方共享。",
+  privacyLabel: "隐私说明",
+  privacyHref: "/policies#privacy",
+};
+
+export const cookieNotice = {
+  title: "关于本地数据",
+  copy: "本站不使用跟踪 Cookie，也不保存健康信息。测评答案与登录状态只保留在当前页面会话中，刷新即清除。",
+  accept: "知道了",
+  more: "隐私说明",
+  href: "/policies#privacy",
+  dismiss: "关闭提示",
+};
+
+export const lockCountdown = {
+  label: "本批次锁单倒计时",
+  hint: "锁单前可自由修改方案、暂停或跳过下一周期",
+  done: "本批次已锁单，下一批次正在开放",
+  unitLabels: { hours: "小时", minutes: "分", seconds: "秒" },
+};
+
+export const footerLegal = {
+  icp: "ICP 备案与营业执照信息将在正式上线时公示",
+  security: "支付通道尚未接入，页面不含真实下单与扣款",
+  copyright: "© 2026 HERSEQUENCE",
+};
+
+export const subpageCrumbs = {
+  home: { label: "首页", href: "/" },
+};
 
 export const trustItems = [
   { id: "packs", label: "每日独立日包", icon: "package" as IconName },
@@ -353,10 +470,36 @@ export const faqs = [
 ];
 
 export const footerColumns = [
-  { title: "定制营养", links: ["女性方案", "透明成分", "订阅计划", "常见问题"] },
-  { title: "了解她序", links: ["品牌理念", "质量标准", "内容中心", "联系我们"] },
-  { title: "关注我们", links: ["小红书", "微信", "抖音", "微博"] },
+  {
+    title: "定制营养",
+    links: [
+      { label: "女性方案", href: "/#personas" },
+      { label: "透明成分", href: "/#ingredients" },
+      { label: "订阅计划", href: "/#pricing" },
+      { label: "开始测评", href: "/quiz" },
+    ],
+  },
+  {
+    title: "了解她序",
+    links: [
+      { label: "品牌理念", href: "/about" },
+      { label: "配方与安全机制", href: "/about#method" },
+      { label: "常见问题", href: "/#faq" },
+      { label: "联系我们", href: "/contact" },
+    ],
+  },
+  {
+    title: "服务条款",
+    links: [
+      { label: "隐私说明", href: "/policies#privacy" },
+      { label: "订阅与价格", href: "/policies#terms" },
+      { label: "配送说明", href: "/policies#shipping" },
+      { label: "退换与售后", href: "/policies#refund" },
+    ],
+  },
 ];
+
+export const footerPayments = ["微信支付", "支付宝", "银联", "银行卡"];
 
 export const compliance =
   "本网站为品牌展示站，不销售实体产品、不发起真实扣款。产品信息仅用于营养与生活方式教育，不构成医疗建议；正式发布前，配方内容由专业人士复核。";

@@ -40,9 +40,9 @@ export const navigation = [
 ];
 
 export const trustItems = [
-  { id: "tested", label: "第三方检测", icon: "shield" as IconName },
-  { id: "expert", label: "营养专家参与设计", icon: "stethoscope" as IconName },
-  { id: "trusted", label: "10万+ 女性信赖", icon: "heart" as IconName },
+  { id: "packs", label: "每日独立日包", icon: "package" as IconName },
+  { id: "transparency", label: "来源与剂型透明", icon: "shield" as IconName },
+  { id: "matching", label: "按阶段与目标组合", icon: "target" as IconName },
 ];
 
 export const painPoints = [
@@ -74,7 +74,7 @@ export const steps = [
     id: "assessment",
     number: "01",
     icon: "clipboard" as IconName,
-    duration: "约 2 分钟",
+    duration: "约 5 分钟",
     title: "完成女性健康测评",
     copy: "回答阶段、饮食、作息与近期关注，让需求不再停留在猜测。",
   },
@@ -83,8 +83,8 @@ export const steps = [
     number: "02",
     icon: "brain" as IconName,
     duration: "即时生成",
-    title: "AI 组合专属方案",
-    copy: "从配方规则与成分知识中生成建议，并以清晰理由解释每一种选择。",
+    title: "生成你的专属方案",
+    copy: "规则引擎梳理需求，AI 帮助解释方案，并以清晰理由说明每一种选择。",
   },
   {
     id: "delivery",
@@ -126,7 +126,7 @@ export const personas: Persona[] = [
     eyebrow: "阶段陪伴",
     tagline: "每一段变化，都值得被温柔承接。",
     ingredients: ["DHA", "铁", "维生素 B12"],
-    detail: "按孕产阶段呈现营养重点；首版仅作概念展示，实际使用应结合个人情况咨询专业人士。",
+    detail: "按孕产阶段呈现营养重点；实际使用应结合个人情况咨询专业人士。",
     accent: "#B998D2",
     imagePosition: "100% 0%",
   },
@@ -250,43 +250,41 @@ export const ingredients: Ingredient[] = [
 export const stories = [
   {
     id: "lin",
-    name: "林岚，31 岁",
-    context: "高压工作 · 睡眠关注",
+    scene: "高压工作 · 睡眠关注",
+    context: "31 岁 · 互联网从业者",
     quote: "以前买了一柜子瓶瓶罐罐，现在每天一袋，终于知道自己为什么在补。",
     duration: "00:18",
     imagePosition: "0% 50%",
   },
   {
     id: "miao",
-    name: "喵喵，28 岁",
-    context: "规律运动 · 素食饮食",
+    scene: "规律运动 · 素食饮食",
+    context: "28 岁 · 运动爱好者",
     quote: "方案会说明成分来源和选择理由，信息很清楚，也更适合我的饮食方式。",
     duration: "00:24",
     imagePosition: "50% 50%",
   },
   {
     id: "chen",
-    name: "陈宁，39 岁",
-    context: "双职工妈妈 · 周期管理",
+    scene: "双职工家庭 · 周期管理",
+    context: "39 岁 · 双职工妈妈",
     quote: "最喜欢的是可以调整和暂停。营养补充终于不再是一件有负担的事。",
     duration: "00:21",
     imagePosition: "100% 50%",
   },
 ];
 
-export const experts = [
+export const principles = [
   {
-    id: "nutrition",
-    initials: "YN",
-    title: "注册营养师顾问",
-    role: "女性阶段营养方向",
+    id: "method",
+    title: "配方形成方法",
+    role: "阶段基础包 + 最多两个重点模块",
     quote: "好的个性化不是把成分堆得更多，而是让每一种选择都有清楚理由。",
   },
   {
-    id: "pharmacy",
-    initials: "LP",
-    title: "配方与质量顾问",
-    role: "原料与质量体系方向",
+    id: "standards",
+    title: "成分筛选标准",
+    role: "来源、剂型与适用限制透明呈现",
     quote: "先把来源、剂型和限制条件说清楚，信任才有真正的起点。",
   },
 ];
@@ -325,12 +323,12 @@ export const faqs = [
   {
     id: "custom",
     question: "个性化方案是怎么生成的？",
-    answer: "测评会收集生命阶段、饮食方式、作息与关注方向，再依据预设配方规则组合建议。首版网站展示的是体验流程，不会收集或保存真实健康信息。",
+    answer: "测评会收集生命阶段、饮食方式、作息与关注方向，再依据预设配方规则组合建议。本站为品牌展示，不会收集或保存真实健康信息。",
   },
   {
     id: "pregnancy",
     question: "备孕、孕期或哺乳期可以直接使用吗？",
-    answer: "这些阶段存在更具体的营养需求与限制。网站内容仅作产品概念展示，实际补充前应携带完整配方表咨询医生或营养专业人士。",
+    answer: "这些阶段存在更具体的营养需求与限制。本站内容为品牌展示，实际补充前应携带完整配方表咨询医生或营养专业人士。",
   },
   {
     id: "medication",
@@ -361,4 +359,4 @@ export const footerColumns = [
 ];
 
 export const compliance =
-  "本页面为概念品牌展示，人物、评价、专家身份及 10 万+ 信任数据均为演示内容。产品信息仅用于营养与生活方式教育，不构成医疗建议。";
+  "本网站为品牌展示站，不销售实体产品、不发起真实扣款。产品信息仅用于营养与生活方式教育，不构成医疗建议；正式发布前，配方内容由专业人士复核。";

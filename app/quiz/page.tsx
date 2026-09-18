@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import QuizExperience from "@/components/QuizExperience";
+import AssessmentExperience from "@/components/assessment/AssessmentExperience";
 
 export const metadata: Metadata = {
-  title: "定制你的每日营养｜她序 HERSEQUENCE",
-  description: "用四个简单问题体验女性阶段营养方案与模拟订阅流程。",
+  title: "生成我的营养方案｜她序 HERSEQUENCE",
+  description: "四章节自适应营养测评：从生命阶段、饮食来源、生活节奏到安全筛查，生成此刻更适合你的每日营养方案。",
 };
 
 export default function QuizPage() {
-  return <QuizExperience />;
+  return <AssessmentExperience />;
 }

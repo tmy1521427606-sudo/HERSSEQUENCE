@@ -90,6 +90,10 @@ npm run build:static   # dev 服务器在跑时用这个，见下方说明
 > 如果已经出现这种情况：停掉 dev → 删除 `.next/`（或 `.next-dev/`）→ 重新 `npm run dev`。`npm run build:static` 会在构建后检查 `.next-dev/` 是否被动过并给出警告。
 >
 > 平时刷新静态预览请用 `npm run build:static`：它把导出写进独立的 `.next-build/`，先复制到临时目录再整体替换 `out/`，因此中途被打断也不会留下半套产物。
+>
+> **导出完整性校验**：`build:static` 会在同步前逐张 HTML 收集 `/_next/...` 引用并逐个校验文件是否存在，缺失就放弃同步、`out/` 保持原样。这是必需的 —— 只判断 `index.html` 与 `_next/static` 存在会被「新 HTML + 旧 `_next/static`」的混合产物骗过去，同步出的站点没有 CSS，表现同样是「顾问按钮掉进文档流、点不开」。
+>
+> 已知坑：本项目的 `next build` 有时会卡在 `Collecting build traces` 很久甚至不返回。此时**构建产物其实已经完整写进 `.next/` 了**，只有导出/同步那一步没跑完。不要直接手工搬文件凑合，建议重跑 `npm run build:static` 并让它跑完；若确实中断，务必确认 `out/_next/static/css/` 非空。
 
 ## 测评架构
 

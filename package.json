@@ -13,6 +13,7 @@
     "lighthouse": "lighthouse http://localhost:4173 --only-categories=performance,accessibility --chrome-flags=\"--headless --no-sandbox\" --output=json --output-path=./lighthouse-report.json"
   },
   "dependencies": {
+    "@volcengine/rtc": "^4.69.2",
     "framer-motion": "11.18.2",
     "lucide-react": "0.468.0",
     "next": "14.2.31",

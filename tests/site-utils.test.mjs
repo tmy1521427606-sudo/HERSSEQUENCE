@@ -30,9 +30,17 @@ test("formats subscription prices and per-day cost", async () => {
   assert.equal(pricePerDay(759, 90), "¥8.4 / 天");
 });
 
-test("cycles through the three demo voice states", async () => {
-  const { nextVoiceState } = await loadUtils();
-  assert.equal(nextVoiceState("idle"), "connecting");
-  assert.equal(nextVoiceState("connecting"), "active");
-  assert.equal(nextVoiceState("active"), "idle");
+test("maps a real RTC session state onto the panel display state", async () => {
+  const { voiceDisplayState } = await loadUtils();
+
+  // 配了后端地址时，展示状态就是 RTC 的真实状态（不再有演示用的状态轮播）
+  assert.equal(voiceDisplayState("idle", true), "idle");
+  assert.equal(voiceDisplayState("connecting", true), "connecting");
+  assert.equal(voiceDisplayState("active", true), "active");
+  assert.equal(voiceDisplayState("error", true), "error");
+
+  // 静态导出站没注入 NEXT_PUBLIC_VOICE_API 时，属于构建配置缺失，
+  // 要单独表达成 unsupported，而不是让用户点了才发现报错
+  assert.equal(voiceDisplayState("idle", false), "unsupported");
+  assert.equal(voiceDisplayState("active", false), "unsupported");
 });

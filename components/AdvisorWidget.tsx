@@ -7,9 +7,19 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { advisorCopy, advisorFallback, advisorQuickReplies, advisorScript } from "@/advisor-content";
 import { ADVISOR_OPEN_EVENT } from "@/lib/advisor-bus";
 import { createMessage, isAdvisorQueryTooShort, matchAdvisorReply, typingDelay, type AdvisorMessage } from "@/lib/advisor-utils";
-import { nextVoiceState, type VoiceState } from "@/lib/site-utils";
+import { voiceDisplayState } from "@/lib/site-utils";
+import { useVoiceChat } from "@/lib/rtc/useVoiceChat";
+import { isVoiceBackendConfigured } from "@/lib/rtc/voice-api";
 
 type Mode = "text" | "voice";
+
+/** 音量条的静态形状：真实音量只缩放它的幅度，不改变整体轮廓。 */
+const LEVEL_BARS = [18, 34, 24, 46, 30, 40, 20, 36, 16];
+
+function formatClock(total: number): string {
+  const minutes = Math.floor(total / 60);
+  return `${String(minutes).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
 
 export default function AdvisorWidget({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const reduceMotion = useReducedMotion();
@@ -18,11 +28,14 @@ export default function AdvisorWidget({ defaultOpen = false }: { defaultOpen?: b
   const [messages, setMessages] = useState<AdvisorMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [typing, setTyping] = useState(false);
-  const [voiceState, setVoiceState] = useState<VoiceState>("idle");
-  const [seconds, setSeconds] = useState(0);
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const timers = useRef<number[]>([]);
+
+  // 语音走真实的火山 RTC 会话：状态、计时、音量、字幕全部由 hook 驱动，
+  // 面板只负责展示与转发用户操作。
+  const voice = useVoiceChat();
+  const voiceState = voiceDisplayState(voice.status, isVoiceBackendConfigured());
 
   // 首次打开时给出欢迎语与常见问题。
   useEffect(() => {
@@ -64,17 +77,13 @@ export default function AdvisorWidget({ defaultOpen = false }: { defaultOpen?: b
 
   useEffect(() => () => { timers.current.forEach((id) => window.clearTimeout(id)); }, []);
 
+  // 离开语音模式或关掉面板时必须结束会话：否则麦克风会一直处于采集状态，
+  // 浏览器标签页上的录音指示灯不会灭，用户会以为还在被听。
   useEffect(() => {
-    if (voiceState !== "connecting") return;
-    const id = window.setTimeout(() => setVoiceState("active"), 1200);
-    return () => window.clearTimeout(id);
-  }, [voiceState]);
-
-  useEffect(() => {
-    if (voiceState !== "active") { setSeconds(0); return; }
-    const id = window.setInterval(() => setSeconds((value) => value + 1), 1000);
-    return () => window.clearInterval(id);
-  }, [voiceState]);
+    if (!open || mode !== "voice") void voice.stop();
+    // voice.stop 是稳定的 useCallback，无需进依赖数组；进了反而会在每次状态变化时反复触发。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, mode]);
 
   function ask(value: string) {
     const query = value.trim();
@@ -107,8 +116,27 @@ export default function AdvisorWidget({ defaultOpen = false }: { defaultOpen?: b
 
   const lastAssistant = [...messages].reverse().find((message) => message.role === "assistant");
   const suggestions = messages.length <= 1 ? advisorQuickReplies : lastAssistant?.followUps ?? advisorQuickReplies.slice(0, 3);
-  const voiceStatus =
-    voiceState === "idle" ? advisorCopy.voiceIdle : voiceState === "connecting" ? advisorCopy.voiceLoading : `${advisorCopy.voiceActive} · 00:${String(seconds).padStart(2, "0")}`;
+
+  const voiceStageCopy = {
+    idle: advisorCopy.voiceIdle,
+    listening: advisorCopy.voiceStageListening,
+    thinking: advisorCopy.voiceStageThinking,
+    speaking: advisorCopy.voiceStageSpeaking,
+  }[voice.stage];
+
+  const voiceStatus = (() => {
+    if (voiceState === "unsupported") return advisorCopy.voiceUnsupported;
+    if (voiceState === "connecting") return advisorCopy.voiceLoading;
+    if (voiceState === "error") return voice.error ?? advisorCopy.voiceIdle;
+    if (voiceState === "active") return `${voiceStageCopy} · ${formatClock(voice.seconds)}`;
+    return advisorCopy.voiceIdle;
+  })();
+
+  // 音量条由真实麦克风电平驱动：没在会话中时收平，避免看起来像在工作。
+  const barHeight = (index: number) => {
+    if (voiceState !== "active") return 8;
+    return Math.max(8, Math.round((LEVEL_BARS[index] ?? 20) * (0.35 + voice.level * 1.5)));
+  };
 
   return (
     // m 组件必须在 LazyMotion 内才会执行动画；缺了它，面板会永远停在
@@ -251,42 +279,76 @@ export default function AdvisorWidget({ defaultOpen = false }: { defaultOpen?: b
                 </form>
               </>
             ) : (
-              <div className="p-5">
-                <p className="rounded-2xl bg-white/7 p-4 text-sm leading-6 text-white/65">“最近入睡有点慢，而且白天工作强度很高，我该优先关注什么？”</p>
-                <div className="my-6 flex h-14 items-center justify-center gap-1" aria-hidden="true">
-                  {[18, 34, 24, 46, 30, 40, 20, 36, 16].map((height, index) => (
-                    <motion.span
-                      key={index}
-                      className="w-1 rounded-full bg-rose"
-                      animate={voiceState === "active" && !reduceMotion ? { height: [10, height, 10] } : { height: 8 }}
-                      transition={{ duration: .7, repeat: voiceState === "active" && !reduceMotion ? Infinity : 0, delay: index * .06 }}
-                    />
-                  ))}
+              <>
+                {/* 真实字幕流：火山通过房间二进制消息回传，由 useVoiceChat 解析成逐句文本。 */}
+                <div
+                  role="log"
+                  aria-live="polite"
+                  aria-relevant="additions"
+                  aria-label="语音对话记录"
+                  className="flex-1 space-y-3 overflow-y-auto p-4"
+                >
+                  {voice.subtitles.length === 0 ? (
+                    <p className="rounded-2xl bg-white/7 p-4 text-sm leading-6 text-white/50">{advisorCopy.voiceEmptyLog}</p>
+                  ) : (
+                    voice.subtitles.map((line) => (
+                      <div key={line.id} className={line.role === "user" ? "flex justify-end" : "flex justify-start"}>
+                        <div className={`max-w-[86%] rounded-2xl px-4 py-3 text-sm leading-6 ${line.role === "user" ? "bg-rose text-ink" : "bg-white/8 text-white/78"} ${line.definite ? "" : "opacity-70"}`}>
+                          {line.role === "assistant" && <p className="mb-1 text-[11px] font-semibold tracking-[.12em] text-rose-200">顾问</p>}
+                          <p>{line.text}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
-                <p className="text-center text-sm text-white/52" aria-live="polite">{voiceStatus}</p>
-                {voiceState === "active" && (
-                  <div className="mt-5 rounded-2xl bg-rose/12 p-4">
-                    <p className="text-xs font-semibold text-rose-200">方案提示</p>
-                    <p className="mt-2 text-sm leading-6 text-white/72">先从作息记录开始；营养方向可关注甘氨酸镁与 B 族维生素。</p>
+
+                <div className="border-t border-white/10 p-5">
+                  <div className="flex h-14 items-center justify-center gap-1" aria-hidden="true">
+                    {LEVEL_BARS.map((_, index) => (
+                      <span
+                        key={index}
+                        className="w-1 rounded-full bg-rose transition-[height] duration-150 ease-out"
+                        style={{ height: `${barHeight(index)}px` }}
+                      />
+                    ))}
                   </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setVoiceState((current) => nextVoiceState(current))}
-                  disabled={voiceState === "connecting"}
-                  className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-rose font-semibold text-ink transition hover:bg-[#f07d9b] disabled:cursor-wait disabled:opacity-70"
-                >
-                  {voiceState === "active" ? <><Pause size={17} aria-hidden="true" />{advisorCopy.voiceEnd}</> : <><Mic size={17} aria-hidden="true" />{voiceState === "connecting" ? advisorCopy.voiceLoading : advisorCopy.voiceStart}</>}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode("text")}
-                  className="mt-3 flex min-h-11 w-full items-center justify-center rounded-full border border-white/15 text-sm font-semibold text-white/70 transition hover:border-rose/40 hover:text-white"
-                >
-                  {advisorCopy.switchToText}
-                </button>
-                <p className="mt-3 text-center text-[11px] text-white/35">{advisorCopy.voiceNote}</p>
-              </div>
+                  <p className="text-center text-sm text-white/52" aria-live="polite">{voiceStatus}</p>
+
+                  {voice.error && voiceState === "error" && (
+                    <p role="alert" className="mt-4 rounded-2xl bg-rose/12 px-4 py-3 text-xs leading-5 text-rose-200">
+                      {voice.error}
+                    </p>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => { if (voiceState === "active") void voice.stop(); else void voice.start(); }}
+                    disabled={voiceState === "connecting" || voiceState === "unsupported"}
+                    className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-rose font-semibold text-ink transition hover:bg-[#f07d9b] disabled:cursor-not-allowed disabled:opacity-55"
+                  >
+                    {voiceState === "active" ? <><Pause size={17} aria-hidden="true" />{advisorCopy.voiceEnd}</> : <><Mic size={17} aria-hidden="true" />{voiceState === "connecting" ? advisorCopy.voiceLoading : advisorCopy.voiceStart}</>}
+                  </button>
+
+                  {voiceState === "active" && (
+                    <button
+                      type="button"
+                      onClick={voice.interrupt}
+                      className="mt-3 flex min-h-11 w-full items-center justify-center rounded-full border border-rose/40 text-sm font-semibold text-rose-200 transition hover:border-rose hover:text-white"
+                    >
+                      {advisorCopy.voiceInterrupt}
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setMode("text")}
+                    className="mt-3 flex min-h-11 w-full items-center justify-center rounded-full border border-white/15 text-sm font-semibold text-white/70 transition hover:border-rose/40 hover:text-white"
+                  >
+                    {advisorCopy.switchToText}
+                  </button>
+                  <p className="mt-3 text-center text-[11px] leading-4 text-white/35">{advisorCopy.voiceNote}</p>
+                </div>
+              </>
             )}
           </motion.aside>
           )}

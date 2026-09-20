@@ -9,3 +9,11 @@ node_modules/
 lighthouse-report.json
 *.log
 *.tsbuildinfo
+
+# 环境变量文件
+# .env.local 用来放 NEXT_PUBLIC_VOICE_API 这类构建期配置。
+# 目前它只包含公开的后端地址，但按惯例一律不入库 ——
+# 一旦将来有人往里加密钥，没有这条规则就会直接提交上去。
+.env
+.env.local
+.env*.local

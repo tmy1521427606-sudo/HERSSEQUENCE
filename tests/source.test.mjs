@@ -86,8 +86,8 @@ test("homepage primary assessment CTAs enter the assessment route", async () => 
   assert.ok(quizLinks.length >= 4, `expected at least four assessment entry points, found ${quizLinks.length}`);
 });
 
-test("advisor panel supports typed conversation, quick replies and a voice mode", async () => {
-  const source = await readSources("components/AdvisorWidget.tsx", "advisor-content.ts", "lib/advisor-utils.ts");
+test("advisor panel supports typed conversation, quick replies and a real voice session", async () => {
+  const source = await readSources("components/AdvisorWidget.tsx", "advisor-content.ts", "lib/advisor-utils.ts", "lib/rtc/useVoiceChat.ts");
 
   for (const marker of [
     "文字提问",
@@ -98,10 +98,17 @@ test("advisor panel supports typed conversation, quick replies and a voice mode"
     "role=\"log\"",
     "aria-live=\"polite\"",
     "advisorCopy.safetyBadge",
-    "不会调用麦克风",
+    // 语音已接真实 RTC 会话：必须真的去起会话，而不是只切本地状态。
+    // 这条断言前身是「不会调用麦克风」—— 语音真实化后那句承诺已不成立，故一并改写。
+    "useVoiceChat",
+    "voice.start",
+    // 如实告知会请求麦克风，不能再宣称「不会调用麦克风」
+    "会请求麦克风权限",
   ]) {
     assert.match(source, new RegExp(marker), `advisor panel should expose ${marker}`);
   }
+
+  assert.doesNotMatch(source, /不会调用麦克风/, "voice mode must not claim it never touches the microphone");
 });
 
 test("storefront chrome matches a standalone shop", async () => {
@@ -280,4 +287,38 @@ test("customer-visible sources never use placeholder-ware wording", async () => 
       assert.ok(!source.includes(phrase), `${target} must not contain "${phrase}"`);
     }
   }
+});
+
+test("build-static refuses to sync an incomplete export", async () => {
+  const source = await readSources("scripts/build-static.mjs");
+
+  // 构建前必须清空导出目录。否则上一次被中断的构建会留下「新 HTML + 旧 _next/static」的
+  // 混合产物：index.html 在、_next/static 也在，能骗过存在性检查，但同步出来的站点没有 CSS，
+  // Tailwind 全丢，position:fixed 的顾问按钮掉进文档流 —— 表现就是“按钮点不开”。
+  assert.ok(
+    source.includes("rmSync(exportDir, { recursive: true, force: true })"),
+    "build-static.mjs 必须在构建前清空导出目录",
+  );
+
+  // 必须逐张 HTML 收集 /_next/ 资源引用并逐个校验存在，而不是只看 index.html。
+  assert.ok(
+    source.includes("matchAll(/\\/_next\\/"),
+    "build-static.mjs 必须逐张 HTML 收集 /_next/ 资源引用",
+  );
+  assert.ok(
+    source.includes("readdirSync(exportDir)"),
+    "build-static.mjs 必须扫描导出目录下所有 HTML",
+  );
+
+  // 有引用缺失时必须放弃同步，保证 out/ 不会被换成半成品。
+  assert.ok(
+    source.includes("missing.length > 0"),
+    "build-static.mjs 必须在资源缺失时中止同步",
+  );
+
+  // 同步到 out/ 之前仍要校验临时目录里的 _next/static。
+  assert.ok(
+    source.includes('path.join(stagingDir, "_next", "static")'),
+    "build-static.mjs 必须校验临时目录里的 _next/static",
+  );
 });
